@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: devops-web
+  labels:
+    app: devops-web
+spec:
+  strategy:
+    rollingUpdate:
+      maxSurge: {{ .Value.deployment.strategy.rollingUpdate.maxSurge }}
+      maxUnavailable: {{ .Value.deployment.strategy.rollingUpdate.maxUnavailable }}
+    type: RollingUpdate
+  replicas: {{ .Values.deployment.replicas }}
+  selector:
+    matchLabels:
+      app: devops-web
+  template:
+    metadata:
+      labels:
+        app: devops-web
+    spec:
+      containers:
+      - name: devops-web
+        image: {{ .Values.deployment.repository.image }}:{{ .Values.deployment.repository.tag }}
+        ports:
+        - containerPort: {{ .Values.deployment.containerPort }}
+        env:
+        - name: PORT
+          valueFrom:
+            configMapKeyRef: 
+              name: devops-web-config
+              key: PORT
+        - name: API_HOST
+          valueFrom:
+            configMapKeyRef: 
+              name: devops-web-config
+              key: API_HOST          
+        
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.service.name }}
+spec:
+  selector:
+    app: devops-web
+  ports:
+    - protocol: TCP
+      port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.targetPort }}
+  type: {{ Values.service.type}}
