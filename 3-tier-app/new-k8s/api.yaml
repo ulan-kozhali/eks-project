@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: devops-api
+  labels:
+    app: devops-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: devops-api
+  template:
+    metadata:
+      labels:
+        app: devops-api
+    spec:
+      containers:
+      - name: devops-api
+        image: ulan025/node-api:1.0.0
+        ports:
+        - containerPort: 3001
+        env:
+        - name: PORT
+          valueFrom:
+            configMapKeyRef: 
+              name: devops-api-config
+              key: PORT
+        - name: DB
+          valueFrom:
+            configMapKeyRef: 
+              name: devops-api-config
+              key: DB
+        - name: DBUSER
+          valueFrom:
+            configMapKeyRef: 
+              name: devops-api-config
+              key: DBUSER
+        - name: DBHOST
+          valueFrom:
+            configMapKeyRef: 
+              name: devops-api-config
+              key: DBHOST
+        - name: DBPORT
+          valueFrom:
+            configMapKeyRef: 
+              name: devops-api-config
+              key: DBPORT
+        - name: DBPASS
+          valueFrom:
+            secretKeyRef: 
+              name: devops-api-secret
+              key: DBPASS                                                                    
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: devops-api
+spec:
+  selector:
+    app: devops-api
+  ports:
+    - protocol: TCP
+      port: 3001
+      targetPort: 3001
+  type: LoadBalancer
