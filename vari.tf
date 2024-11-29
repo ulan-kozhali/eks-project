@@ -1,4 +1,4 @@
-variable "cluster_name" {
-  default = "terraform-eks-demo"
-  type    = string
-}
+# variable "cluster_name" {
+#   default = "terraform-eks-demo"
+#   type    = string
+# }
